@@ -1,0 +1,45 @@
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+
+# Sample historical weather data (dummy data)
+data = {
+    'date': pd.date_range(start='2022-01-01', periods=365),
+    'temperature': np.random.uniform(10, 40, 365)  # Random temperature values for illustration
+}
+
+df = pd.DataFrame(data)
+
+# Define a function to generate alerts based on temperature thresholds
+def generate_heat_wave_alerts(df, threshold_temp):
+    alerts = []
+    heat_wave_started = False
+    heat_wave_start_date = None
+    
+    for index, row in df.iterrows():
+        if row['temperature'] >= threshold_temp:
+            if not heat_wave_started:
+                heat_wave_start_date = row['date']
+                heat_wave_started = True
+        else:
+            if heat_wave_started:
+                heat_wave_end_date = row['date'] - timedelta(days=1)
+                alerts.append({
+                    'start_date': heat_wave_start_date,
+                    'end_date': heat_wave_end_date,
+                    'severity': 'High',  # Placeholder for severity level based on criteria
+                    'message': 'Heat wave alert: High temperature detected.'
+                })
+                heat_wave_started = False
+    
+    return alerts
+
+# Example usage
+if __name__ == "__main__":
+    threshold_temperature = 35  # Example threshold temperature (adjust as needed)
+    
+    alerts = generate_heat_wave_alerts(df, threshold_temperature)
+    
+    # Print alerts (in real application, you would send alerts to a mobile platform)
+    for alert in alerts:
+        print(f"Alert: {alert['message']} Start Date: {alert['start_date']} End Date: {alert['end_date']}")
